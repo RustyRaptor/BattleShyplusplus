@@ -1,45 +1,110 @@
 #include <QCoreApplication>
 #include <iostream>
 #include <cstdlib>
-#include <stdio.h>
-#include <cmath>
-#include <string>
-#include <cstring>
-#include <fstream>
-#include <sstream>
-#include <cstring>
+#include <ctime>
 
-using namespace std;
+
 
 int i, j;
-const int X = 4; // X size of game board
-const int Y = 4; // Y size
-int board[X][Y];
+int turn;
+const int X = 100; // X size of game board
+const int Y = 100; // Y size
+char board[X][Y];
+int Xlen = sizeof(board)/sizeof(*board);
+int Ylen = sizeof(board[0])/sizeof(*board[0]);
+int shipRow;
+int shipCol;
+int guessRow;
+int guessCol;
 
-void create_board(int xsize, int ysize) {
+
+
+void createBoard(int xsize, int ysize) {
         for ( i = 0; i < xsize; i++ ) { // outer loop iterates rows
-                for ( j = 0; j < ysize; j++ ) { // inter loop iterates columns
-                        board[i][j] = 0;
+                for ( j = 0; j < ysize; j++ ) { // inner loop iterates cols
+                        board[i][j] = '0';
                 }
         }
 }
 
-void print_board(auto board) {
+
+void printBoard(auto board) {
         // display the matrix
         for ( i = 0; i < X; i++ ) {
                 for ( j = 0; j < Y; j++ ) {
-                cout << board[i][j] << " ";
+                std::cout << board[i][j] << " ";
                 }
-                cout << endl;
+                std::cout << std::endl;
         }
+}
+
+int randomCol(int col){
+        srand ( time(0));
+        return std::rand() %col;
+}
+
+int randomRow(int row){
+        srand ( time(0));
+        return std::rand() %row;
 }
 
 int main(int argc, char *argv[])
 {
         QCoreApplication a(argc, argv);
-        create_board(X, Y);
-        print_board(board);
 
+        std::cout << sizeof(board)/sizeof(*board) << std::endl;
+        std::cout << "Loading coordinates..." << std::endl;
+        createBoard(X, Y);
+        std::cout << "Loading ship data..." << std::endl;
+        shipRow = randomRow(Xlen);
+        shipCol = randomCol(Ylen);
+        std::cout << "Let's play Battleship!" << std::endl;
+        printBoard(board);
+
+        for(turn = 0; turn < 100000; turn++) {
+                srand ( time(0));
+                guessRow = randomRow(Xlen);
+                srand ( time(0));
+                guessCol = randomCol(Ylen);
+
+                // if the player hits...
+                if((guessRow == shipRow) && (guessCol == shipCol)) {
+                        std::cout << "Target neutralized!" << std::endl;
+                        // we turn the "0" into "+" when the player hits
+                        board[guessRow][guessCol] = '+';
+                        break;
+                }
+
+                else{
+                        // if the player picks a location off the grid...
+                        if ((guessRow < 0 || guessRow >= X) ||
+                                        (guessCol < 0 || guessCol >= X)){
+                                std::cout << "Coordinates undefined!"
+                                          << std::endl;
+                        }
+                        // else if the player strikes a previously hit location.
+                        else if (board[guessRow][guessCol] == 'X'){
+                                std::cout << "Coordinates already hit!"
+                                          << std::endl;
+                                printBoard(board);
+                        }
+                        else{
+                            std::cout << "Target missed!" << std::endl;
+                            // we turn the "0" into an "X" when we miss
+                            board[guessRow][guessCol] = 'X';
+
+                        }
+                        // This is the turn system.
+                        std::cout << "Turn: " << turn + 1 << std::endl;
+                }
+                if (turn == 8){
+                        std::cout << "Defeat!" << std::endl;
+                        std::cout << "The target location was: "
+                                  << shipRow << "," << shipCol
+                                  << std::endl;
+                }
+                printBoard(board);
+        }
 
         return a.exec();
 }
@@ -47,13 +112,8 @@ int main(int argc, char *argv[])
 
 
 
-//def print_board(board):
-//    for row in board:
-//        print ' '.join(row)
 
 
-
-//board = []
 
 //# prompt player to set difficulty
 //difficulty = raw_input('Set difficulty. Must be 1, 2, or 3:')
@@ -91,55 +151,11 @@ int main(int argc, char *argv[])
 //    a = 7
 
 
-//# this function will let you print the board at any part of the program.
-//def print_board(board):
-//    for row in board:
-//        print ' '.join(row)
-
-
-//print 'Let\'s play Battleship!'
-//print_board(board)
-
-
 //# This function will allow us to generate a random coordinate for the ship's location
 //def random_row(board):
 //    return randint(0, len(board) - 1)
 
 
-//def random_col(board):
-//    return randint(0, len(board[0]) - 1)
 
 
-//ship_row = random_row(board)
-//ship_col = random_col(board)
 
-//# prompts the user to guess where the ship it on the grid
-//for turn in range(9):
-//    guess_row = int(raw_input('Guess Row:'))
-//    guess_col = int(raw_input('Guess Collumn:'))
-//    # if the player hits it...
-//    if guess_row == ship_row and guess_col == ship_col:
-//        print 'Target Neutralized'
-//        # we turn the "0" into a "+" when the player hits the ship
-//        board[guess_row][guess_col] = '+'
-//        break
-
-//    else:
-//        # if the player picks a location off the grid...
-//        if (guess_row < 0 or guess_row >= a) or (guess_col < 0 or guess_col >= a):
-//            print 'Coordinates undefined'
-//        # if the player picks a location that's already been picked
-//        elif board[guess_row][guess_col] == 'X':
-//            print 'coordinates already struck'
-//            print_board(board)
-//        # if the player misses the ship
-//        else:
-//            print 'Target Missed'
-//            # we turn the "0" into an "X" when it is hit and misses
-//            board[guess_row][guess_col] = 'X'
-//            # This is the turn system.
-//        print 'Turn', turn + 1
-//if turn == 8:
-//    print 'Defeat'
-//    print 'the target location was', str(ship_row), ' , ', str(ship_col)
-//print_board(board)

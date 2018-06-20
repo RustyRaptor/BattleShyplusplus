@@ -4,7 +4,6 @@
 #include <ctime>
 
 
-
 int i, j;
 int turn;
 const int X = 100; // X size of game board
@@ -18,38 +17,39 @@ int guessRow;
 int guessCol;
 
 
-
-void createBoard(int xsize, int ysize) {
+void createBoard(int xsize, int ysize)
+{
         for ( i = 0; i < xsize; i++ ) { // outer loop iterates rows
-                for ( j = 0; j < ysize; j++ ) { // inner loop iterates cols
+                for ( j = 0; j < ysize; j++ ) // inner loop iterates cols
                         board[i][j] = '0';
-                }
         }
 }
 
-
-void printBoard(auto board) {
+void printBoard(auto board)
+{
         // display the matrix
         for ( i = 0; i < X; i++ ) {
-                for ( j = 0; j < Y; j++ ) {
-                std::cout << board[i][j] << " ";
-                }
+                for ( j = 0; j < Y; j++ )
+                        std::cout << board[i][j] << " ";
                 std::cout << std::endl;
         }
 }
 
-int randomCol(int col){
-        srand ( time(0));
-        return std::rand() %col;
-}
+int randomCol(int col) {return std::rand() %col;}
 
-int randomRow(int row){
-        srand ( time(0));
-        return std::rand() %row;
+int randomRow(int row) {return std::rand() %row;}
+
+bool onGrid(int row, int col, int x, int y)
+{
+        if ((row < 0 || row > x) || (col < 0 || col > y))
+                return false;
+        else
+                return true;
 }
 
 int main(int argc, char *argv[])
 {
+        srand(std::time(NULL));
         QCoreApplication a(argc, argv);
 
         std::cout << sizeof(board)/sizeof(*board) << std::endl;
@@ -61,28 +61,24 @@ int main(int argc, char *argv[])
         std::cout << "Let's play Battleship!" << std::endl;
         printBoard(board);
 
-        for(turn = 0; turn < 100000; turn++) {
-                srand ( time(0));
+        for(turn = 0; turn < 5; turn++) {
                 guessRow = randomRow(Xlen);
-                srand ( time(0));
                 guessCol = randomCol(Ylen);
-
-                // if the player hits...
+                // player hits.
                 if((guessRow == shipRow) && (guessCol == shipCol)) {
                         std::cout << "Target neutralized!" << std::endl;
-                        // we turn the "0" into "+" when the player hits
+                        // turn the "0" into "+" when player hits.
                         board[guessRow][guessCol] = '+';
                         break;
                 }
 
                 else{
-                        // if the player picks a location off the grid...
-                        if ((guessRow < 0 || guessRow >= X) ||
-                                        (guessCol < 0 || guessCol >= X)){
+                        // player picks a location off the grid.
+                        if (onGrid(guessRow, guessCol, X, Y)){
                                 std::cout << "Coordinates undefined!"
                                           << std::endl;
                         }
-                        // else if the player strikes a previously hit location.
+                        // player strikes a previously hit location.
                         else if (board[guessRow][guessCol] == 'X'){
                                 std::cout << "Coordinates already hit!"
                                           << std::endl;
